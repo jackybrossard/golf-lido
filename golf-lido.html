@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Golf Lido</title>
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAC+klEQVR42u3dsU3DUABFUS/ELAjGoGENNmIVCnoGYACQI4HSIBFw4p/7j6Ur0UDxfLCQ45BlGfy4ebj90FgtDmCBB1iAQyy4QRbYICsP2wlSBraTogRqJ0IZ2MZXBrXRlUFtbGVQG1kZ1MZVBrVRlUFtTGVQG1Ep1AZUBrTxlEFtNKVQG0wZ0MZSCrWhlAFtJKVQG0gZ0MZRCrVhBLQ0ImijKIXaIAJaAlo6M2hjKIXaEAJaAloCWgJaQEtAS0OBNsJ2vby/Hnp7vPv+2i5AJ0B/ZRegU6DhBjoLGmygk6DhBjoLGmygk6DhBjoLGmygk6DhBjoLGmygk6DhBjoLGmygk6DhBjoLenbYQEdBz4ob6AlAzwQb6IlAz4Ab6ElBV2EDPTnoGm6gXaFdoeVvaKCBhhhooEEGGmivFMqzHEDL03ZAAw0y0EBDDLT3FAIt7/oGWv4vB9BAQwx0EbTdgL560LYCOgHaRkBfPWi7AJ0A7TNWgM6APs4uQAMtoIEW0EADLaCBBlpAAy2ggQbaCEADLaCBBlpAAy2ggQZaQAMtoIEGWkADLaCBBlpAAy2ggQZaQAMtoIEGWkADDTTQQAMtoIEW0EADLaCBBhpooIEW0EALaKCBFtBAAw000EALaKAFNNBAC2iggRbQQAtooAU00EALaKCBFtBAC2iggRbQQAtooIEW0EALaKCBFtBAC2iggRbQQAtooIEW0EALaKCBFtDjg75/fgIa6DFbcZ7aevzl++wN9O54jxH/dPzn5zovQF8M8W8wb4Ea7hNArwfE58W8JWq4gR4CM9RADwt5FNBgAw000DBvhRlqoF2hYQYaaKDd5XCXowMaavehU5hnfHHFK4VAw+1ZDqA9bQfvLqCh3vaXwA47YwZaQEsjg4ZaKcxAKwcaaqUwA60caKiVwgy0cqChVgoz1MphBlo50FArhRlq5TBDrRxmqJXDDLVymKFWDjPUymGGWjnMYCsHGWolMYOtHGSwlYQMtpKQ4VYSMeAAX+r4BOz3XHbbYv1YAAAAAElFTkSuQmCC">
+<meta name="apple-mobile-web-app-title" content="Golf Lido">
+<style>
+  :root {
+    --green: #2D6A4F;
+    --green-light: #52B788;
+    --green-pale: #D8F3DC;
+    --sand: #F9F3E8;
+    --charcoal: #1B2021;
+    --muted: #7A8B7E;
+    --white: #FFFFFF;
+    --bus-a: #E76F51;
+    --bus-11: #457B9D;
+    --radius: 16px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    background: var(--sand);
+    color: var(--charcoal);
+    min-height: 100vh;
+    padding-bottom: calc(20px + var(--safe-bottom));
+  }
+
+  header {
+    background: var(--green);
+    padding: calc(var(--safe-top) + 18px) 20px 18px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+  .header-left h1 { font-size: 26px; font-weight: 700; color: var(--white); letter-spacing: -0.5px; line-height: 1; }
+  .header-left .subtitle { font-size: 13px; color: var(--green-pale); margin-top: 4px; font-weight: 400; }
+  .time-display { text-align: right; }
+  .time-display .now { font-size: 28px; font-weight: 600; color: var(--white); font-variant-numeric: tabular-nums; letter-spacing: -1px; }
+  .time-display .date { font-size: 11px; color: var(--green-light); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.8px; }
+
+  /* Direction toggle (Aller/Retour) */
+  .dir-toggle {
+    margin: 14px 20px 0;
+    display: flex;
+    background: #1f4f3a;
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
+  }
+  .dir-btn {
+    flex: 1;
+    padding: 10px 0;
+    border: none;
+    border-radius: 9px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: -0.2px;
+  }
+  .dir-btn.active {
+    background: var(--white);
+    color: var(--green);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+
+  /* Feriale/Festivo toggle */
+  .tipo-toggle {
+    margin: 10px 20px 0;
+    display: flex;
+    background: #DDE8E0;
+    border-radius: 10px;
+    padding: 3px;
+    gap: 3px;
+  }
+  .tipo-btn {
+    flex: 1;
+    padding: 7px 0;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    color: var(--muted);
+  }
+  .tipo-btn.active { background: var(--white); color: var(--green); box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+
+  .section-label {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    letter-spacing: 1.2px; text-transform: uppercase; padding: 16px 20px 8px;
+  }
+  .departures { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0 14px;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
+  .card.bus-a::before { background: var(--bus-a); }
+  .card.bus-11::before { background: var(--bus-11); }
+  .card.next { border: 1.5px solid var(--green-light); }
+
+  .badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; border-radius: 10px;
+    font-size: 13px; font-weight: 800; letter-spacing: -0.3px;
+  }
+  .card.bus-a .badge { background: #FDEDE8; color: var(--bus-a); }
+  .card.bus-11 .badge { background: #E8F1F7; color: var(--bus-11); }
+
+  .card-middle { display: flex; flex-direction: column; gap: 3px; }
+  .depart-time { font-size: 22px; font-weight: 700; color: var(--charcoal); font-variant-numeric: tabular-nums; letter-spacing: -0.5px; line-height: 1; }
+  .route-info { font-size: 12px; color: var(--muted); line-height: 1.3; }
+  .dest-name { font-weight: 600; color: var(--charcoal); font-size: 13px; }
+
+  .card-right { text-align: right; }
+  .arr-time { font-size: 17px; font-weight: 600; color: var(--green); font-variant-numeric: tabular-nums; }
+  .countdown { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .countdown.imminent { color: #E76F51; font-weight: 600; }
+
+  /* Compte à rebours principal — plus grand */
+  .countdown-big {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--green);
+    font-variant-numeric: tabular-nums;
+    margin-top: 3px;
+    letter-spacing: -0.5px;
+  }
+  .countdown-big.imminent { color: #E76F51; }
+
+  .next-tag {
+    position: absolute; top: 10px; right: 12px;
+    font-size: 9px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
+    color: var(--green); background: var(--green-pale); padding: 2px 6px; border-radius: 4px;
+  }
+  .no-service { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 15px; }
+  .no-service .icon { font-size: 40px; margin-bottom: 10px; }
+
+  .info-box {
+    margin: 14px 20px 0;
+    background: #E8F4EC;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: var(--green);
+    line-height: 1.6;
+  }
+  .info-box strong { font-weight: 700; }
+
+  .refresh-btn {
+    display: block; margin: 14px 20px 0; width: calc(100% - 40px);
+    padding: 14px; background: var(--green); color: white; border: none;
+    border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer;
+  }
+  .refresh-btn:active { opacity: 0.85; }
+
+  .divider { height: 1px; background: #E8ECE9; margin: 14px 20px; }
+  .legend { margin: 0 20px 20px; display: flex; flex-direction: column; gap: 6px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>⛳ Golf Lido</h1>
+    <div class="subtitle" id="header-subtitle">Prochains départs depuis S.M.E.</div>
+  </div>
+  <div class="time-display">
+    <div class="now" id="clock">--:--</div>
+    <div class="date" id="dateLabel">--</div>
+  </div>
+</header>
+
+<!-- Aller / Retour -->
+<div class="dir-toggle">
+  <button class="dir-btn active" id="btn-aller" onclick="setDir('aller')">⬇ Aller · S.M.E. → Golf</button>
+  <button class="dir-btn" id="btn-retour" onclick="setDir('retour')">⬆ Retour · Golf → S.M.E.</button>
+</div>
+
+<!-- Feriale / Festivo -->
+<div class="tipo-toggle">
+  <button class="tipo-btn active" id="btn-auto" onclick="setTipo('auto')">Auto</button>
+  <button class="tipo-btn" id="btn-feriale" onclick="setTipo('feriale')">Feriale</button>
+  <button class="tipo-btn" id="btn-festivo" onclick="setTipo('festivo')">Festivo</button>
+</div>
+
+<div id="departures-container"></div>
+
+<button class="refresh-btn" onclick="render()">↻ Actualiser</button>
+
+<div class="divider"></div>
+<div class="legend" id="legend-box"></div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// DONNÉES ALLER : S.MARIA ELISABETTA → Golf
+// Bus A : { dep, arr, spiaggia }
+//   dep = départ SME, arr = arrêt CA' ROSSA (4586) heure exacte PDF
+//   spiaggia=true → bus va à Alberoni Spiaggia  (départs :06 :26 :46)
+//   spiaggia=false → bus va à Faro Rocchetta     (départs :16 :36 :56)
+// ═══════════════════════════════════════════════════
+
+const BUS_A_ALLER = [
+  // Matin (tous Faro Rocchetta)
+  { dep: toMin("05:38"), arr: toMin("05:54"), spiaggia: false },
+  { dep: toMin("05:52"), arr: toMin("06:08"), spiaggia: false },
+  { dep: toMin("06:10"), arr: toMin("06:26"), spiaggia: false },
+  { dep: toMin("06:18"), arr: toMin("06:34"), spiaggia: false },
+  { dep: toMin("06:28"), arr: toMin("06:44"), spiaggia: false },
+  { dep: toMin("06:46"), arr: toMin("07:02"), spiaggia: false },
+  { dep: toMin("06:56"), arr: toMin("07:12"), spiaggia: false },
+  // Journée : :06 :26 :46 → Spiaggia / :16 :36 :56 → Golf(Faro)
+  { dep: toMin("07:06"), arr: toMin("07:22"), spiaggia: true  },
+  { dep: toMin("07:16"), arr: toMin("07:32"), spiaggia: false },
+  { dep: toMin("07:26"), arr: toMin("07:42"), spiaggia: true  },
+  { dep: toMin("07:36"), arr: toMin("07:52"), spiaggia: false },
+  { dep: toMin("07:46"), arr: toMin("08:02"), spiaggia: true  },
+  { dep: toMin("07:56"), arr: toMin("08:12"), spiaggia: false },
+  { dep: toMin("08:06"), arr: toMin("08:22"), spiaggia: true  },
+  { dep: toMin("08:16"), arr: toMin("08:32"), spiaggia: false },
+  { dep: toMin("08:26"), arr: toMin("08:42"), spiaggia: true  },
+  { dep: toMin("08:36"), arr: toMin("08:52"), spiaggia: false },
+  { dep: toMin("08:46"), arr: toMin("09:02"), spiaggia: true  },
+  { dep: toMin("08:56"), arr: toMin("09:12"), spiaggia: false },
+  { dep: toMin("09:06"), arr: toMin("09:22"), spiaggia: true  },
+  { dep: toMin("09:16"), arr: toMin("09:32"), spiaggia: false },
+  { dep: toMin("09:26"), arr: toMin("09:42"), spiaggia: true  },
+  { dep: toMin("09:36"), arr: toMin("09:52"), spiaggia: false },
+  { dep: toMin("09:46"), arr: toMin("10:02"), spiaggia: true  },
+  { dep: toMin("09:56"), arr: toMin("10:12"), spiaggia: false },
+  { dep: toMin("10:06"), arr: toMin("10:22"), spiaggia: true  },
+  { dep: toMin("10:16"), arr: toMin("10:32"), spiaggia: false },
+  { dep: toMin("10:26"), arr: toMin("10:42"), spiaggia: true  },
+  { dep: toMin("10:36"), arr: toMin("10:52"), spiaggia: false },
+  { dep: toMin("10:46"), arr: toMin("11:02"), spiaggia: true  },
+  { dep: toMin("10:56"), arr: toMin("11:12"), spiaggia: false },
+  { dep: toMin("11:06"), arr: toMin("11:22"), spiaggia: true  },
+  { dep: toMin("11:16"), arr: toMin("11:32"), spiaggia: false },
+  { dep: toMin("11:26"), arr: toMin("11:42"), spiaggia: true  },
+  { dep: toMin("11:36"), arr: toMin("11:52"), spiaggia: false },
+  { dep: toMin("11:46"), arr: toMin("12:02"), spiaggia: true  },
+  { dep: toMin("11:56"), arr: toMin("12:12"), spiaggia: false },
+  { dep: toMin("12:06"), arr: toMin("12:22"), spiaggia: true  },
+  { dep: toMin("12:16"), arr: toMin("12:32"), spiaggia: false },
+  { dep: toMin("12:26"), arr: toMin("12:42"), spiaggia: true  },
+  { dep: toMin("12:36"), arr: toMin("12:52"), spiaggia: false },
+  { dep: toMin("12:46"), arr: toMin("13:02"), spiaggia: true  },
+  { dep: toMin("12:56"), arr: toMin("13:12"), spiaggia: false },
+  { dep: toMin("13:06"), arr: toMin("13:22"), spiaggia: true  },
+  { dep: toMin("13:16"), arr: toMin("13:32"), spiaggia: false },
+  { dep: toMin("13:26"), arr: toMin("13:42"), spiaggia: true  },
+  { dep: toMin("13:36"), arr: toMin("13:52"), spiaggia: false },
+  { dep: toMin("13:46"), arr: toMin("14:02"), spiaggia: true  },
+  { dep: toMin("13:56"), arr: toMin("14:12"), spiaggia: false },
+  { dep: toMin("14:06"), arr: toMin("14:22"), spiaggia: true  },
+  { dep: toMin("14:16"), arr: toMin("14:32"), spiaggia: false },
+  { dep: toMin("14:26"), arr: toMin("14:42"), spiaggia: true  },
+  { dep: toMin("14:36"), arr: toMin("14:52"), spiaggia: false },
+  { dep: toMin("14:46"), arr: toMin("15:02"), spiaggia: true  },
+  { dep: toMin("14:56"), arr: toMin("15:12"), spiaggia: false },
+  { dep: toMin("15:06"), arr: toMin("15:22"), spiaggia: true  },
+  { dep: toMin("15:16"), arr: toMin("15:32"), spiaggia: false },
+  { dep: toMin("15:26"), arr: toMin("15:42"), spiaggia: true  },
+  { dep: toMin("15:36"), arr: toMin("15:52"), spiaggia: false },
+  { dep: toMin("15:46"), arr: toMin("16:02"), spiaggia: true  },
+  { dep: toMin("15:56"), arr: toMin("16:12"), spiaggia: false },
+  { dep: toMin("16:06"), arr: toMin("16:22"), spiaggia: true  },
+  { dep: toMin("16:16"), arr: toMin("16:32"), spiaggia: false },
+  { dep: toMin("16:26"), arr: toMin("16:42"), spiaggia: true  },
+  { dep: toMin("16:36"), arr: toMin("16:52"), spiaggia: false },
+  { dep: toMin("16:46"), arr: toMin("17:02"), spiaggia: true  },
+  { dep: toMin("16:56"), arr: toMin("17:12"), spiaggia: false },
+  { dep: toMin("17:06"), arr: toMin("17:22"), spiaggia: true  },
+  { dep: toMin("17:16"), arr: toMin("17:32"), spiaggia: false },
+  { dep: toMin("17:26"), arr: toMin("17:42"), spiaggia: true  },
+  { dep: toMin("17:36"), arr: toMin("17:52"), spiaggia: false },
+  { dep: toMin("17:46"), arr: toMin("18:02"), spiaggia: true  },
+  { dep: toMin("17:56"), arr: toMin("18:12"), spiaggia: false },
+  { dep: toMin("18:06"), arr: toMin("18:22"), spiaggia: true  },
+  { dep: toMin("18:16"), arr: toMin("18:32"), spiaggia: false },
+  { dep: toMin("18:26"), arr: toMin("18:42"), spiaggia: true  },
+  { dep: toMin("18:36"), arr: toMin("18:52"), spiaggia: false },
+  { dep: toMin("18:46"), arr: toMin("19:02"), spiaggia: true  },
+  { dep: toMin("18:56"), arr: toMin("19:12"), spiaggia: false },
+  { dep: toMin("19:06"), arr: toMin("19:22"), spiaggia: true  },
+  { dep: toMin("19:16"), arr: toMin("19:32"), spiaggia: false },
+  { dep: toMin("19:26"), arr: toMin("19:42"), spiaggia: true  },
+  { dep: toMin("19:36"), arr: toMin("19:52"), spiaggia: false },
+  { dep: toMin("19:46"), arr: toMin("20:02"), spiaggia: false },
+  { dep: toMin("19:56"), arr: toMin("20:32"), spiaggia: false },
+  { dep: toMin("20:08"), arr: toMin("20:54"), spiaggia: false },
+  { dep: toMin("21:10"), arr: toMin("21:11"), spiaggia: false },
+  { dep: toMin("21:30"), arr: toMin("21:30"), spiaggia: false },
+  { dep: toMin("21:50"), arr: toMin("22:02"), spiaggia: false },
+  { dep: toMin("22:10"), arr: toMin("22:22"), spiaggia: false },
+  { dep: toMin("22:30"), arr: toMin("22:42"), spiaggia: false },
+  { dep: toMin("22:50"), arr: toMin("23:02"), spiaggia: false },
+  { dep: toMin("23:08"), arr: toMin("23:20"), spiaggia: false },
+  { dep: toMin("23:48"), arr: toMin("00:00"), spiaggia: false },
+  { dep: toMin("00:08"), arr: toMin("00:20"), spiaggia: false },
+];
+
+// Bus 11 ALLER : [dep_SME, arr_DellaDroma]
+const BUS_11_ALLER = [
+  [toMin("00:25"), toMin("00:42")],
+  [toMin("05:05"), toMin("05:22")],
+  [toMin("05:50"), toMin("06:07")],
+  [toMin("06:20"), toMin("06:37")],
+  [toMin("06:55"), toMin("07:12")],
+  [toMin("07:25"), toMin("07:42")],
+  [toMin("07:55"), toMin("08:12")],
+  [toMin("08:30"), toMin("08:47")],
+  [toMin("09:30"), toMin("09:47")],
+  [toMin("10:00"), toMin("10:17")],
+  [toMin("10:30"), toMin("10:47")],
+  [toMin("11:00"), toMin("11:17")],
+  [toMin("11:30"), toMin("11:47")],
+  [toMin("12:30"), toMin("12:47")],
+  [toMin("13:10"), toMin("13:27")],
+  [toMin("13:40"), toMin("13:57")],
+  [toMin("14:10"), toMin("14:27")],
+  [toMin("14:40"), toMin("14:57")],
+  [toMin("15:40"), toMin("15:57")],
+  [toMin("16:10"), toMin("16:27")],
+  [toMin("16:40"), toMin("16:57")],
+  [toMin("17:10"), toMin("17:27")],
+  [toMin("17:40"), toMin("17:57")],
+  [toMin("18:10"), toMin("18:27")],
+  [toMin("18:40"), toMin("18:57")],
+  [toMin("19:10"), toMin("19:27")],
+  [toMin("19:40"), toMin("19:57")],
+  [toMin("20:05"), toMin("20:22")],
+  [toMin("20:30"), toMin("20:47")],
+  [toMin("21:30"), toMin("21:47")],
+  [toMin("22:30"), toMin("22:47")],
+  [toMin("23:25"), toMin("23:42")],
+];
+
+// ═══════════════════════════════════════════════════
+// DONNÉES RETOUR : Golf (4587 = Faro +1min) → S.MARIA ELISABETTA (4641)
+// Faro Rocchetta : xx:13 xx:33 xx:53 → Golf : xx:14 xx:34 xx:54 → SME ~18min après
+// Horaires PDF retour Bus A (toutes les 20min en journée)
+// ═══════════════════════════════════════════════════
+
+const BUS_A_RETOUR = [
+  // Matin début de service (irrégulier selon PDF)
+  { dep: toMin("05:25"), arr: toMin("05:43") },
+  { dep: toMin("06:06"), arr: toMin("06:24") },
+  { dep: toMin("06:16"), arr: toMin("06:34") },
+  { dep: toMin("06:36"), arr: toMin("06:54") },
+  { dep: toMin("06:44"), arr: toMin("07:02") },
+  { dep: toMin("07:04"), arr: toMin("07:22") },
+  { dep: toMin("07:14"), arr: toMin("07:32") },
+  { dep: toMin("07:24"), arr: toMin("07:42") },
+  { dep: toMin("07:34"), arr: toMin("07:52") },
+  { dep: toMin("07:54"), arr: toMin("08:12") },
+  // Journée régulière : xx:14 xx:34 xx:54 → arrivée SME ~18min après
+  { dep: toMin("08:14"), arr: toMin("08:32") },
+  { dep: toMin("08:34"), arr: toMin("08:52") },
+  { dep: toMin("08:54"), arr: toMin("09:12") },
+  { dep: toMin("09:14"), arr: toMin("09:32") },
+  { dep: toMin("09:34"), arr: toMin("09:52") },
+  { dep: toMin("09:54"), arr: toMin("10:12") },
+  { dep: toMin("10:14"), arr: toMin("10:32") },
+  { dep: toMin("10:34"), arr: toMin("10:52") },
+  { dep: toMin("10:54"), arr: toMin("11:12") },
+  { dep: toMin("11:14"), arr: toMin("11:32") },
+  { dep: toMin("11:34"), arr: toMin("11:52") },
+  { dep: toMin("11:54"), arr: toMin("12:12") },
+  { dep: toMin("12:14"), arr: toMin("12:32") },
+  { dep: toMin("12:34"), arr: toMin("12:52") },
+  { dep: toMin("12:54"), arr: toMin("13:12") },
+  { dep: toMin("13:14"), arr: toMin("13:32") },
+  { dep: toMin("13:34"), arr: toMin("13:52") },
+  { dep: toMin("13:54"), arr: toMin("14:12") },
+  { dep: toMin("14:14"), arr: toMin("14:32") },
+  { dep: toMin("14:34"), arr: toMin("14:52") },
+  { dep: toMin("14:54"), arr: toMin("15:12") },
+  { dep: toMin("15:14"), arr: toMin("15:32") },
+  { dep: toMin("15:34"), arr: toMin("15:52") },
+  { dep: toMin("15:54"), arr: toMin("16:12") },
+  { dep: toMin("16:14"), arr: toMin("16:32") },
+  { dep: toMin("16:34"), arr: toMin("16:52") },
+  { dep: toMin("16:54"), arr: toMin("17:12") },
+  { dep: toMin("17:14"), arr: toMin("17:32") },
+  { dep: toMin("17:34"), arr: toMin("17:52") },
+  { dep: toMin("17:54"), arr: toMin("18:12") },
+  { dep: toMin("18:14"), arr: toMin("18:32") },
+  { dep: toMin("18:34"), arr: toMin("18:52") },
+  { dep: toMin("18:54"), arr: toMin("19:12") },
+  { dep: toMin("19:14"), arr: toMin("19:32") },
+  { dep: toMin("19:34"), arr: toMin("19:52") },
+  { dep: toMin("19:54"), arr: toMin("20:12") },
+  { dep: toMin("20:14"), arr: toMin("20:32") },
+  // Fin de service (PDF, moins fréquent)
+  { dep: toMin("20:54"), arr: toMin("21:10") },
+  { dep: toMin("21:14"), arr: toMin("21:30") },
+  { dep: toMin("21:34"), arr: toMin("21:50") },
+  { dep: toMin("21:54"), arr: toMin("22:10") },
+  { dep: toMin("22:16"), arr: toMin("22:32") },
+  { dep: toMin("22:36"), arr: toMin("22:52") },
+  { dep: toMin("22:56"), arr: toMin("23:12") },
+  { dep: toMin("23:16"), arr: toMin("23:32") },
+  { dep: toMin("23:36"), arr: toMin("23:52") },
+  { dep: toMin("00:36"), arr: toMin("00:52") },
+];
+
+// ═══════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════
+
+function toMin(str) {
+  const [h, m] = str.split(':').map(Number);
+  return h * 60 + m;
+}
+function minToStr(m) {
+  m = ((m % 1440) + 1440) % 1440;
+  return `${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
+}
+function getNowMin() {
+  const n = new Date(); return n.getHours()*60 + n.getMinutes();
+}
+function isFestivo() { return new Date().getDay() === 0; }
+function getJourLabel() {
+  const d = new Date();
+  const days = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  const months = ['jan','fév','mar','avr','mai','juin','jul','aoû','sep','oct','nov','déc'];
+  return `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`;
+}
+function getTipoLabel(tipo) {
+  if (tipo === 'festivo') return 'Festivo';
+  if (tipo === 'feriale') return 'Feriale';
+  return isFestivo() ? 'Festivo' : 'Feriale';
+}
+
+// ═══════════════════════════════════════════════════
+// ÉTAT
+// ═══════════════════════════════════════════════════
+
+let tipoMode = 'auto';
+let dirMode  = 'aller';
+
+function setTipo(t) {
+  tipoMode = t;
+  document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + t).classList.add('active');
+  render();
+}
+function setDir(d) {
+  dirMode = d;
+  document.querySelectorAll('.dir-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + d).classList.add('active');
+  render();
+}
+
+// ═══════════════════════════════════════════════════
+// LOGIQUE
+// ═══════════════════════════════════════════════════
+
+function getEffectiveFestivo() {
+  if (tipoMode === 'festivo') return true;
+  if (tipoMode === 'feriale') return false;
+  return isFestivo();
+}
+
+function getNextSimple(schedules, nowMin, count) {
+  // schedules: array of { dep, arr } or [dep, arr]
+  const results = [];
+  for (const e of schedules) {
+    const dep = Array.isArray(e) ? e[0] : e.dep;
+    const arr = Array.isArray(e) ? e[1] : e.arr;
+    let diff = dep - nowMin;
+    if (diff < 0) diff += 1440;
+    results.push({ dep, arr, diff });
+  }
+  results.sort((a, b) => a.diff - b.diff);
+  return results.slice(0, count);
+}
+
+function getNextAllerA(nowMin, count) {
+  const results = [];
+  for (const e of BUS_A_ALLER) {
+    let diff = e.dep - nowMin;
+    if (diff < 0) diff += 1440;
+    results.push({ dep: e.dep, arr: e.arr, diff, spiaggia: e.spiaggia });
+  }
+  results.sort((a, b) => a.diff - b.diff);
+  return results.slice(0, count);
+}
+
+function mergeAndSort(...arrays) {
+  return arrays.flat().sort((a, b) => a.diff - b.diff);
+}
+
+// ═══════════════════════════════════════════════════
+// RENDU
+// ═══════════════════════════════════════════════════
+
+function render() {
+  const nowMin = getNowMin();
+
+  // Mise à jour header
+  const sub = document.getElementById('header-subtitle');
+  if (dirMode === 'aller') {
+    sub.textContent = 'Prochains départs depuis S.M.E.';
+  } else {
+    sub.textContent = 'Prochains départs depuis Golf';
+  }
+
+  // Légende
+  const legendBox = document.getElementById('legend-box');
+  if (dirMode === 'aller') {
+    legendBox.innerHTML = `
+      <div class="legend-item"><div class="legend-dot" style="background:var(--bus-a)"></div>Bus A → Arrêt <strong>Golf</strong>, ou <strong>Ca' Rossa</strong> si bus Spiaggia</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--bus-11)"></div>Bus 11 → <strong>Alberoni Della Droma</strong></div>`;
+  } else {
+    legendBox.innerHTML = `
+      <div class="legend-item"><div class="legend-dot" style="background:var(--bus-a)"></div>Bus A → Départ <strong>Golf</strong> (Faro Rocchetta +1min) → <strong>S.M.E.</strong></div>`;
+  }
+
+  let top3;
+  if (dirMode === 'aller') {
+    const nextA  = getNextAllerA(nowMin, 3).map(x => ({ ...x, type: 'A' }));
+    const next11 = getNextSimple(BUS_11_ALLER, nowMin, 3).map(x => ({ ...x, type: '11' }));
+    top3 = mergeAndSort(nextA, next11).slice(0, 3);
+  } else {
+    top3 = getNextSimple(BUS_A_RETOUR, nowMin, 3).map(x => ({ ...x, type: 'A' }));
+  }
+
+  const container = document.getElementById('departures-container');
+  if (!top3.length) {
+    container.innerHTML = `<div class="no-service"><div class="icon">🌙</div>Pas de service pour le moment</div>`;
+    return;
+  }
+
+  let html = `<div class="section-label">Prochains départs — ${getTipoLabel(tipoMode)}</div><div class="departures">`;
+
+  top3.forEach((trip, i) => {
+    const depStr = minToStr(trip.dep);
+    const arrStr = minToStr(trip.arr);
+    const isNext = i === 0;
+    const typeClass = trip.type === 'A' ? 'bus-a' : 'bus-11';
+
+    // Countdown affiché pour les cartes 2 et 3
+    let countdownHtml = '';
+    if (isNext) {
+      countdownHtml = `<div class="countdown-big" id="countdown-next"></div>`;
+    } else {
+      const mins = trip.diff;
+      let txt = '', cls = 'countdown';
+      if (mins <= 5)       { txt = `dans ${mins} min`; cls = 'countdown imminent'; }
+      else if (mins < 60)  { txt = `dans ${mins} min`; }
+      else { const h=Math.floor(mins/60),m=mins%60; txt=m>0?`dans ${h}h${String(m).padStart(2,'0')}`:`dans ${h}h`; }
+      countdownHtml = `<div class="${cls}">${txt}</div>`;
+    }
+
+    let destName = '', routeInfo = '';
+    if (dirMode === 'aller') {
+      if (trip.type === 'A') {
+        if (trip.spiaggia) {
+          destName = 'Ca\' Rossa';
+          routeInfo = 'Bus A · Via Sandro Gallo <strong style="color:var(--bus-a)">→ SPIAGGIA</strong>';
+        } else {
+          destName = 'Golf';
+          routeInfo = 'Bus A · Via Sandro Gallo → Faro Rocchetta';
+        }
+      } else {
+        destName = 'Alberoni Della Droma';
+        routeInfo = 'Bus 11 · Direct Lido→Alberoni';
+      }
+    } else {
+      destName = 'S.Maria Elisabetta';
+      routeInfo = 'Bus A · Via Sandro Gallo';
+    }
+
+    html += `
+    <div class="card ${typeClass}${isNext ? ' next' : ''}">
+      ${isNext ? '<div class="next-tag">PROCHAIN</div>' : ''}
+      <div class="badge">${trip.type === 'A' ? 'BUS A' : 'N°11'}</div>
+      <div class="card-middle">
+        <div class="depart-time">${depStr}</div>
+        <div class="dest-name">${destName}</div>
+        <div class="route-info">${routeInfo}</div>
+      </div>
+      <div class="card-right">
+        <div class="arr-time">${arrStr}</div>
+        ${countdownHtml}
+      </div>
+    </div>`;
+
+    if (isNext) window._nextDepMin = trip.dep;
+  });
+
+  html += '</div>';
+
+  // Info box
+  if (dirMode === 'aller') {
+    html += `<div class="info-box">
+      <strong>⛳ Arrêts :</strong><br>
+      Bus A (xx:16 xx:36 xx:56) → <strong>Golf</strong> · Bus A (xx:06 xx:26 xx:46) → <strong>Ca' Rossa</strong> → Spiaggia<br>
+      Bus 11 → <strong>Alberoni Della Droma</strong>
+    </div>`;
+  } else {
+    html += `<div class="info-box">
+      <strong>🏠 Retour :</strong><br>
+      Départ <strong>Golf</strong> (arrêt Faro Rocchetta +1min)<br>
+      Arrivée <strong>S.Maria Elisabetta</strong>
+    </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+// HORLOGE & COMPTE À REBOURS
+// ═══════════════════════════════════════════════════
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  document.getElementById('dateLabel').textContent = getJourLabel();
+}
+
+function updateCountdown() {
+  const el = document.getElementById('countdown-next');
+  if (!el || window._nextDepMin === undefined) return;
+  const now = new Date();
+  const nowSec = now.getHours()*3600 + now.getMinutes()*60 + now.getSeconds();
+  let diff = window._nextDepMin * 60 - nowSec;
+  if (diff < 0) diff += 86400;
+  if (diff > 7200) { render(); return; }
+  if (diff <= 0) { el.textContent = 'En route !'; el.className = 'countdown-big imminent'; setTimeout(render, 5000); return; }
+
+  const mm = Math.floor(diff / 60);
+  const ss = diff % 60;
+  let txt, cls = 'countdown-big';
+  if (diff < 60)       { txt = `${ss}s`; cls += ' imminent'; }
+  else if (diff < 300) { txt = `${mm}m ${String(ss).padStart(2,'0')}s`; cls += ' imminent'; }
+  else                 { txt = `${mm}m ${String(ss).padStart(2,'0')}s`; }
+  el.textContent = txt;
+  el.className = cls;
+}
+
+updateClock();
+render();
+updateCountdown();
+setInterval(() => { updateClock(); updateCountdown(); }, 1000);
+setInterval(render, 30000);
+</script>
+</body>
+</html>
